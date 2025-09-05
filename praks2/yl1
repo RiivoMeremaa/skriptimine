@@ -3,5 +3,7 @@
 #Skript ütleb tere preagusele userile
 #Anda õigused chmod +x ./yl1
 
-echo "Tere, $USER"
+user="${USER^}"
+
+echo "Tere, $user"
 echo "!"
