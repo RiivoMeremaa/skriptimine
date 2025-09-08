@@ -1,0 +1,25 @@
+#! /bin/bash
+
+echo -n "Sisesta ainepunktide arv (täisarv): "
+read ainepunktid
+
+if ! [[ "$ainepunktid" =~ ^[0-9]+$ ]] || [ "$ainepunktid" -le 0 ]; then
+  echo "Palun sisesta positiivne täisarv ainepunktide arvuks."
+  exit 1
+fi
+
+echo -n "Sisesta nädalate arv (täisarv): "
+read nadalad
+
+if ! [[ "$nadalad" =~ ^[0-9]+$ ]] || [ "$nadalad" -le 0 ]; then
+  echo "Palun sisesta positiivne täisarv nädalate arvuks."
+  exit 1
+fi
+
+kogutunnid=$(expr $ainepunktid \* 26)
+
+ajakulu=$(echo "scale=2; $kogutunnid / $nadalad" | bc)
+
+ajakulu_ymardatud=$(echo "($ajakulu + 0.9)/1" | bc)
+
+echo "Ühe nädala eeldatav ajakulu: $ajakulu_ymardatud tundi"
