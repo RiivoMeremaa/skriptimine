@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo -n "Sisesta suvaline täisarv: "
+read arv
+
+if ! [[ $arv =~ ^-?[0-9]+$ ]]; then
+    echo "Viga: Palun sisesta korrektne täisarv!"
+    exit 1
+fi
+
+sign=1
+[[ $arv == -* ]] && sign=-1
+
+abs_arv=${arv#-}
+summa=0
+
+while [ $abs_arv -ne 0 ]; do
+    digit=$((abs_arv % 10))
+    summa=$((summa + digit))
+    abs_arv=$((abs_arv / 10))
+done
+
+summa=$((summa * sign))
+
+echo "Arvu $arv numbrite summa on $summa"
