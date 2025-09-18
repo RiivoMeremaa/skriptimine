@@ -7,7 +7,7 @@ read -rp "Sisesta kataloogi tee, mida varundada: " kataloog
 
 for k in "${KEELATUD[@]}"; do
   if [[ "$kataloog" == "$k" || "$kataloog" == "$k/"* ]]; then
-    echo "Viga: kataloogi '$kataloog' pole antud luba."
+    echo "Viga: kataloogi '$kataloog' on keelatud, puudub vajalikud õigused."
     exit 1
   fi
 done
