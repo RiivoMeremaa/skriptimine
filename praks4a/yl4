@@ -1,7 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
+KEELATUD=("/var/tmp" "/tmp" "/root")
+
 read -rp "Sisesta kataloogi tee, mida varundada: " kataloog
+
+for k in "${KEELATUD[@]}"; do
+  if [[ "$kataloog" == "$k" || "$kataloog" == "$k/"* ]]; then
+    echo "Viga: kataloogi '$kataloog' pole antud luba."
+    exit 1
+  fi
+done
 
 if [ ! -d "$kataloog" ]; then
   echo "Viga: kataloogi '$kataloog' ei leitud."
@@ -15,6 +24,11 @@ failinimi="backup/${nimi}.backup.tar.gz"
 
 echo "Varundan kataloogi: $kataloog"
 echo "Varukoopia salvestatakse faili: $failinimi"
+
+lugemata_failid=$(find "$kataloog" ! -readable 2>/dev/null | wc -l || echo 0)
+if [ "$lugemata_failid" -gt 0 ]; then
+  echo "Hoiatus: kataloogis on faile, mida ei saa lugeda. Võimalik, et puuduvad root õigused."
+fi
 
 tar -czf "$failinimi" -C "$(dirname "$kataloog")" "$nimi"
 
