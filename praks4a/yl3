@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "Loon kataloogi 'test' koos failide ja kataloogidega..."
+
+mkdir -p test
+
+for i in {1..4}; do
+  echo "See on fail$i" > test/fail$i.txt
+done
+
+mkdir -p test/kataloog1 test/kataloog2
+
+echo "Fail kataloogis 1" > test/kataloog1/fail.txt
+echo "Fail kataloogis 2" > test/kataloog2/fail.txt
+
+mkdir -p backup
+
+echo "Pakime kataloogi 'test' kokku ja salvestame faili 'backup/test.backup.tar.gz'..."
+
+tar -czf backup/test.backup.tar.gz test
+
+echo "Varundus tehtud edukalt!"
+echo "Kaust 'test' on varundatud faili 'backup/test.backup.tar.gz'."
