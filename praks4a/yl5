@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+
+read -rp "Sisesta kataloogi tee, mida varundada: " kataloog
+
+if [ ! -d "$kataloog" ]; then
+  echo "Viga: kataloogi '$kataloog' ei leitud."
+  exit 1
+fi
+
+kuupaev=$(date +%d%b%Y | tr '[:upper:]' '[:lower:]')
+nimi=$(basename "$kataloog")
+backupdir="backup"
+mkdir -p "$backupdir"
+failinimi="${backupdir}/${nimi}.backup.${kuupaev}.tar.gz"
+
+echo "Varundan kataloogi: $kataloog"
+echo "Varukoopia salvestatakse faili: $failinimi"
+
+tar -czf "$failinimi" -C "$(dirname "$kataloog")" "$nimi"
+
+echo "Varundus edukalt lõpetatud."
