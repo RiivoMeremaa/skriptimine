@@ -3,6 +3,11 @@ set -euo pipefail
 
 read -rp "Sisesta kataloogi tee, mida varundada: " kataloog
 
+if [[ "$kataloog" == "/var/tmp" || "$kataloog" == /var/tmp/* ]]; then
+  echo "Viga: kataloogi '$kataloog' on keelatud, puuduvad vajalikud õigused."
+  exit 1
+fi
+
 if [ ! -d "$kataloog" ]; then
   echo "Viga: kataloogi '$kataloog' ei leitud."
   exit 1
