@@ -1,7 +1,17 @@
-echo "Varundan kataloogi './test' faili 'test.backup.tar.gz' kataloogi './backup'."
+#!/bin/bash
 
-mkdir -p ./backup
+set -euo pipefail
 
-tar -czf ./backup/test.backup.tar.gz ./test
+mkdir -p test/subdir1 test/subdir2
+echo "Fail 1 sisu" > test/fail1.txt
+echo "Fail 2 sisu" > test/fail2.txt
+echo "Fail 3 sisu" > test/fail3.txt
+echo "Fail 4 sisu" > test/fail4.txt
+echo "Alamfail 1" > test/subdir1/fail_sub1.txt
+echo "Alamfail 2" > test/subdir2/fail_sub2.txt
 
-echo "Varundamine lõpetatud. Fail salvestatud: ./backup/test.backup.tar.gz"
+mkdir -p backup
+
+tar -czf backup/test.backup.tar.gz test
+
+echo "Varundan kataloogi 'test' faili 'backup/test.backup.tar.gz'."
