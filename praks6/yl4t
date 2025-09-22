@@ -1,0 +1,26 @@
+#!/bin/bash
+
+for arv in {1..20}
+do
+    if [ "$arv" -le 1 ]; then
+        echo "$arv - ei ole algarv"
+        continue
+    fi
+
+    jagaja=2
+    on_algarv=1
+
+    while [ $jagaja -lt "$arv" ]
+    do
+        if (( arv % jagaja == 0 )); then
+            echo "$arv - ei ole algarv"
+            on_algarv=0
+            break
+        fi
+        jagaja=$((jagaja + 1))
+    done
+
+    if [ $on_algarv -eq 1 ]; then
+        echo "$arv - on algarv"
+    fi
+done
