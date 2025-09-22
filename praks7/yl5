@@ -1,0 +1,22 @@
+#!/bin/bash
+
+read -p "Sisesta ridade arv: " ridu
+
+for ((i=1; i<=ridu; i++))
+do
+  echo -n "$i. "
+  o_arv=$((ridu - i))
+  t_star=$i
+
+  for ((j=1; j<=o_arv; j++))
+  do
+    echo -n "o "
+  done
+
+  for ((k=1; k<=t_star; k++))
+  do
+    echo -n "* "
+  done
+
+  echo
+done
