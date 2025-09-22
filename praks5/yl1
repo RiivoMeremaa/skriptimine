@@ -1,27 +1,29 @@
-#! /bin/bash
-
+#!/bin/bash
 
 echo -n "Sisesta (oma) vanus: "
 read vanus
 
-if ! [[ "$vanus" =~ ^[0-9]+$ ]]
-then
+# Kontroll, kas sisestus on täisarv
+if ! [[ "$vanus" =~ ^[0-9]+$ ]]; then
     echo "Vigane sisend: palun sisesta positiivne täisarv"
-elif test $vanus -ge 0 -a $vanus -lt 11
-then
+    exit 1
+fi
+
+# Kui vanus on suurem kui 110
+if [ "$vanus" -gt 110 ]; then
+    echo "Oled surnud"
+    exit 0
+fi
+
+# Vanusekategooriad
+if [ "$vanus" -lt 11 ]; then
     echo "Oled laps"
-elif test $vanus -ge 11 -a $vanus -lt 18
-then
+elif [ "$vanus" -lt 18 ]; then
     echo "Oled nooruk"
-elif test $vanus -ge 18 -a $vanus -le 25
-then
+elif [ "$vanus" -le 25 ]; then
     echo "Oled noor täiskasvanu"
-elif test $vanus -ge 26 -a $vanus -lt 63
-then
+elif [ "$vanus" -lt 63 ]; then
     echo "Oled täiskasvanu"
-elif test $vanus -ge 63
-then
-    echo "Oled senjoor"
 else
-    echo "Vigane sisend"
+    echo "Oled senjoor"
 fi
