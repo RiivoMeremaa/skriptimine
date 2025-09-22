@@ -1,13 +1,21 @@
 #!/bin/bash
 
-read -p "Sisesta ridade arv: " ridu
-read -p "Sisesta tarnide arv reas: " tarnid
+read -p "Sisesta ridade arv (1–100): " ridu
+read -p "Sisesta tärnide arv reas (1–100): " tarnid
 
-for i in $(seq 1 $ridu)
-do
+if ! [[ "$ridu" =~ ^[0-9]+$ && "$tarnid" =~ ^[0-9]+$ ]]; then
+    echo "Viga: Palun sisesta ainult numbrid (täisarvud)."
+    exit 1
+fi
+
+if [ "$ridu" -lt 1 ] || [ "$ridu" -gt 100 ] || [ "$tarnid" -lt 1 ] || [ "$tarnid" -gt 100 ]; then
+    echo "Viga: Arvud peavad olema vahemikus 1 kuni 100."
+    exit 1
+fi
+
+for ((i=1; i<=ridu; i++)); do
   echo -n "$i. "
-  for ((j=1; j<=tarnid; j++))
-  do
+  for ((j=1; j<=tarnid; j++)); do
     echo -n "* "
   done
   echo
