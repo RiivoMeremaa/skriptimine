@@ -1,23 +1,32 @@
 #!/bin/bash
 
-read -p "Sisesta ridade arv: " ridu
-read -p "Sisesta tarnide arv reas: " tarnid
+read -p "Sisesta ridade arv (1–99): " ridu
+read -p "Sisesta tärnide arv reas (1–99): " tarnid
 
-for ((i=1; i<=ridu; i++))
-do
+if ! [[ "$ridu" =~ ^[0-9]+$ && "$tarnid" =~ ^[0-9]+$ ]]; then
+    echo "Viga: Ainult täisarvud on lubatud."
+    exit 1
+fi
+
+if [ "$ridu" -lt 1 ] || [ "$ridu" -ge 100 ] || [ "$tarnid" -lt 1 ] || [ "$tarnid" -ge 100 ]; then
+    echo "Viga: Arvud peavad olema vahemikus 1 kuni 99."
+    exit 1
+fi
+
+for ((i=1; i<=ridu; i++)); do
   echo -n "$i. "
   if [[ $i -eq 1 || $i -eq $ridu ]]; then
-    for ((j=1; j<=tarnid; j++))
-    do
+    for ((j=1; j<=tarnid; j++)); do
       echo -n "* "
     done
   else
     echo -n "* "
-    for ((j=2; j<tarnid; j++))
-    do
+    for ((j=2; j<tarnid; j++)); do
       echo -n "  "
     done
-    echo -n "*"
+    if [ "$tarnid" -gt 1 ]; then
+      echo -n "*"
+    fi
   fi
   echo
 done
