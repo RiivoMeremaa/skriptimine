@@ -1,0 +1,26 @@
+#!/bin/bash
+
+read -p "Sisesta suvaline arv: " arv
+
+if ! [[ "$arv" =~ ^[0-9]+$ ]]; then
+    echo "$arv - ei ole korrektne täisarv"
+    exit 1
+fi
+
+if [ "$arv" -le 1 ]; then
+    echo "$arv - ei ole algarv"
+    exit 0
+fi
+
+jagaja=2
+
+while [ $jagaja -lt "$arv" ]
+do
+    if (( arv % jagaja == 0 )); then
+        echo "$arv - ei ole algarv"
+        exit 0
+    fi
+    jagaja=$((jagaja + 1))
+done
+
+echo "$arv - on algarv"
