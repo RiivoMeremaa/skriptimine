@@ -2,25 +2,40 @@
 
 read -p "Sisesta suvaline arv: " arv
 
+# Kontrolli, kas sisestus on täisarv
 if ! [[ "$arv" =~ ^[0-9]+$ ]]; then
     echo "$arv - ei ole korrektne täisarv"
     exit 1
 fi
 
+# 0 ja 1 ei ole algarvud
 if [ "$arv" -le 1 ]; then
     echo "$arv - ei ole algarv"
     exit 0
 fi
 
-jagaja=2
+# 2 on esimene ja väikseim algarv
+if [ "$arv" -eq 2 ]; then
+    echo "$arv - on algarv"
+    exit 0
+fi
 
-while [ $jagaja -lt "$arv" ]
-do
+# Kui arv on paarisarv ja pole 2, siis ei ole see algarv
+if (( arv % 2 == 0 )); then
+    echo "$arv - ei ole algarv"
+    exit 0
+fi
+
+# Kontrollime jagatavust kuni √arv (kiirem)
+piir=$(echo "sqrt($arv)" | bc)
+
+jagaja=3
+while [ "$jagaja" -le "$piir" ]; do
     if (( arv % jagaja == 0 )); then
         echo "$arv - ei ole algarv"
         exit 0
     fi
-    jagaja=$((jagaja + 1))
+    jagaja=$((jagaja + 2))  # ainult paaritud jagajad
 done
 
 echo "$arv - on algarv"
