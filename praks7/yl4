@@ -1,6 +1,16 @@
 #!/bin/bash
 
-read -p "Sisesta ridade arv: " ridu
+read -p "Sisesta ridade arv (1–99): " ridu
+
+if ! [[ "$ridu" =~ ^[0-9]+$ ]]; then
+    echo "Viga: Ainult täisarvud on lubatud."
+    exit 1
+fi
+
+if [ "$ridu" -lt 1 ] || [ "$ridu" -ge 100 ]; then
+    echo "Viga: Arv peab olema vahemikus 1 kuni 99."
+    exit 1
+fi
 
 for ((i=1; i<=ridu; i++))
 do
