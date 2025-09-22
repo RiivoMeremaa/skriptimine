@@ -1,27 +1,65 @@
 #!/bin/bash
-set -euo pipefail
 
-read -rp "Sisesta kataloogi tee, mida varundada: " kataloog
-
-if [[ "$kataloog" == "/var/tmp" || "$kataloog" == /var/tmp/* ]]; then
-  echo "Viga: kataloogi '$kataloog' on keelatud, puuduvad vajalikud õigused."
-  exit 1
-fi
-
+read -p "Sisesta kataloogi tee, mida soovid varundada: " kataloog
 if [ ! -d "$kataloog" ]; then
-  echo "Viga: kataloogi '$kataloog' ei leitud."
-  exit 1
+    echo "Kataloogi '$kataloog' ei eksisteeri."
+    exit 1
 fi
 
-kuupaev=$(date +%d%b%Y | tr '[:upper:]' '[:lower:]')
-nimi=$(basename "$kataloog")
-backupdir="backup"
-mkdir -p "$backupdir"
-failinimi="${backupdir}/${nimi}.backup.${kuupaev}.tar.gz"
+if [ ! -r "$kataloog" ]; then
+    echo "Selle kausta varundamiseks on vaja rohkem õigusi."
+    exit 1
+fi
 
-echo "Varundan kataloogi: $kataloog"
-echo "Varukoopia salvestatakse faili: $failinimi"
+read -p "Sisesta kataloog, kuhu soovid backupi salvestada: " backup_kataloog
 
-tar -czf "$failinimi" -C "$(dirname "$kataloog")" "$nimi"
+if [ ! -d "$backup_kataloog" ]; then
+    echo "Backup kataloogi '$backup_kataloog' ei eksisteeri."
+    exit 1
+fi
 
-echo "Varundus edukalt lõpetatud."
+if [ ! -w "$backup_kataloog" ]; then
+    echo "Backup kataloogi '$backup_kataloog' kirjutamise õigused puuduvad."
+    exit 1
+fi
+
+katalooginimi=$(basename "$kataloog")
+kuupaev=$(date +"%d%b%Y" | tr '[:upper:]' '[:lower:]')
+
+function leia_vaba_failinimi() {
+    local baasnimi="$1"
+    local kataloog="$2"
+    local number=1
+    local failinimi="$baasnimi.backup.$kuupaev.tar.gz"
+
+    if [ ! -e "$kataloog/$failinimi" ]; then
+        echo "$failinimi"
+        return
+    fi
+
+    while [ -e "$kataloog/$baasnimi.backup.$kuupaev.$number.tar.gz" ]; do
+        number=$((number + 1))
+    done
+
+    echo "$baasnimi.backup.$kuupaev.$number.tar.gz"
+}
+
+failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog")
+
+if [ -e "$backup_kataloog/$katalooginimi.backup.tar.gz" ]; then
+    read -p "Backup fail '$katalooginimi.backup.tar.gz' juba olemas. Kas soovid luua uue varukoopia versiooni? (jah/ei): " vastus
+    if [[ "$vastus" =~ ^(jah)$ ]]; then
+        failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog")
+    else
+        echo "Varundamine katkestatud."
+        exit 0
+    fi
+fi
+
+if tar -czf "$backup_kataloog/$failinimi" -C "$(dirname "$kataloog")" "$katalooginimi" 2>/dev/null; then
+    echo "Varundamine lõpetatud. Fail salvestatud: $backup_kataloog/$failinimi"
+else
+    echo "Varundamine ebaõnnestus. Võimalik, et sul puuduvad vajalikud õigused kõikide failide lugemiseks."
+    [ -f "$backup_kataloog/$failinimi" ] && rm -f "$backup_kataloog/$failinimi"
+    exit 1
+fi
