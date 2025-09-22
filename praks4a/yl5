@@ -1,24 +1,27 @@
 #!/bin/bash
 
-read -p "Sisesta kataloogi tee, mida soovid varundada: " kataloog
-if [ ! -d "$kataloog" ]; then
+read -r -p "Sisesta kataloogi tee, mida soovid varundada: " kataloog
+kataloog="${kataloog/#\~/$HOME}"
+
+if [[ ! -d "$kataloog" ]]; then
     echo "Kataloogi '$kataloog' ei eksisteeri."
     exit 1
 fi
 
-if [ ! -r "$kataloog" ]; then
-    echo "Selle kausta varundamiseks on vaja rohkem õigusi."
+if [[ ! -r "$kataloog" ]]; then
+    echo "Selle kausta varundamiseks on vaja lugemisõigusi."
     exit 1
 fi
 
-read -p "Sisesta kataloog, kuhu soovid backupi salvestada: " backup_kataloog
+read -r -p "Sisesta kataloog, kuhu soovid backupi salvestada: " backup_kataloog
+backup_kataloog="${backup_kataloog/#\~/$HOME}"
 
-if [ ! -d "$backup_kataloog" ]; then
+if [[ ! -d "$backup_kataloog" ]]; then
     echo "Backup kataloogi '$backup_kataloog' ei eksisteeri."
     exit 1
 fi
 
-if [ ! -w "$backup_kataloog" ]; then
+if [[ ! -w "$backup_kataloog" ]]; then
     echo "Backup kataloogi '$backup_kataloog' kirjutamise õigused puuduvad."
     exit 1
 fi
@@ -26,40 +29,40 @@ fi
 katalooginimi=$(basename "$kataloog")
 kuupaev=$(date +"%d%b%Y" | tr '[:upper:]' '[:lower:]')
 
-function leia_vaba_failinimi() {
+leia_vaba_failinimi() {
     local baasnimi="$1"
-    local kataloog="$2"
+    local sihtkataloog="$2"
+    local kuup="$3"
     local number=1
-    local failinimi="$baasnimi.backup.$kuupaev.tar.gz"
+    local failinimi="${baasnimi}.backup.${kuup}.tar.gz"
 
-    if [ ! -e "$kataloog/$failinimi" ]; then
+    if [[ ! -e "$sihtkataloog/$failinimi" ]]; then
         echo "$failinimi"
         return
     fi
 
-    while [ -e "$kataloog/$baasnimi.backup.$kuupaev.$number.tar.gz" ]; do
-        number=$((number + 1))
+    while [[ -e "$sihtkataloog/${baasnimi}.backup.${kuup}.${number}.tar.gz" ]]; do
+        ((number++))
     done
 
-    echo "$baasnimi.backup.$kuupaev.$number.tar.gz"
+    echo "${baasnimi}.backup.${kuup}.${number}.tar.gz"
 }
 
-failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog")
+failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog" "$kuupaev")
 
-if [ -e "$backup_kataloog/$katalooginimi.backup.tar.gz" ]; then
-    read -p "Backup fail '$katalooginimi.backup.tar.gz' juba olemas. Kas soovid luua uue varukoopia versiooni? (jah/ei): " vastus
-    if [[ "$vastus" =~ ^(jah)$ ]]; then
-        failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog")
-    else
+if [[ -e "$backup_kataloog/$katalooginimi.backup.tar.gz" ]]; then
+    read -r -p "Backup fail '$katalooginimi.backup.tar.gz' juba olemas. Kas soovid luua uue varukoopia versiooni? (jah/ei): " vastus
+    if [[ ! "$vastus" =~ ^(jah|Jah|JAH)$ ]]; then
         echo "Varundamine katkestatud."
         exit 0
     fi
+    failinimi=$(leia_vaba_failinimi "$katalooginimi" "$backup_kataloog" "$kuupaev")
 fi
 
-if tar -czf "$backup_kataloog/$failinimi" -C "$(dirname "$kataloog")" "$katalooginimi" 2>/dev/null; then
+if tar -czf "$backup_kataloog/$failinimi" -C "$(dirname "$kataloog")" "$katalooginimi"; then
     echo "Varundamine lõpetatud. Fail salvestatud: $backup_kataloog/$failinimi"
 else
-    echo "Varundamine ebaõnnestus. Võimalik, et sul puuduvad vajalikud õigused kõikide failide lugemiseks."
-    [ -f "$backup_kataloog/$failinimi" ] && rm -f "$backup_kataloog/$failinimi"
+    echo "Varundamine ebaõnnestus. Kontrolli õigusi ja tee uuesti proovimist."
+    [[ -f "$backup_kataloog/$failinimi" ]] && rm -f "$backup_kataloog/$failinimi"
     exit 1
 fi
