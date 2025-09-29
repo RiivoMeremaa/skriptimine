@@ -1,0 +1,14 @@
+#! /bin/bash
+#Riivo Meremaa Skript info
+#Skripti kasutamine ütleb kasutajale tere ja tänase aja ja kuupäeva
+
+user="${USER^}"
+
+echo "Tere, $user"
+
+today_date="$(date +"Today is %A, %B %d, %Y")"
+time_rn="$(date +"Time is %H:%M")"
+
+echo "$today_date"
+echo "$time_rn"
+
